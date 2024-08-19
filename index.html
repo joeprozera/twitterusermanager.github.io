@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Username Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        label, input, button { margin: 10px 0; }
+        #message { font-weight: bold; margin-top: 20px; }
+        ul { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Followed Twitter Usernames</h1>
+    <form id="usernameForm">
+        <label for="username">Enter Twitter Username:</label>
+        <input type="text" id="username" name="username" required>
+        <button type="submit">Submit</button>
+    </form>
+    <p id="message"></p>
+    
+    <h2>List of Followed Usernames</h2>
+    <ul id="userList">
+        {% for user in followed_users %}
+            <li>{{ user.username }}</li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        document.getElementById('usernameForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const response = await fetch('/submit-username', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username }),
+            });
+            const result = await response.json();
+            document.getElementById('message').textContent = result.message;
+
+            // Refresh the list of followed usernames
+            const userList = document.getElementById('userList');
+            if (response.ok) {
+                const newItem = document.createElement('li');
+                newItem.textContent = username;
+                userList.appendChild(newItem);
+            }
+        });
+    </script>
+</body>
+</html>
